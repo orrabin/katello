@@ -34,7 +34,14 @@ namespace :katello do
         #there may be some invalid hosts, if there are create a primary interface
         ::Host.includes(:interfaces).find_each do |host|
           if host.primary_interface.nil?
-            host.interfaces.create!(:primary => true)
+            interfaces = host.interfaces.new(:primary => true)
+            if interfaces.valid?
+              interfaces.save!
+            else
+              $stderr.print "Interface Invalid: "
+              $stderr.print "#{interfaces.inspect}\n"
+              $stderr.print "#{interfaces.errors.full_messages}\n"
+            end
           end
         end
 
